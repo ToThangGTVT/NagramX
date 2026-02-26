@@ -169,7 +169,7 @@ object NaConfig {
         addConfig(
             "CustomTitle",
             ConfigItem.configTypeString,
-            "Nagram X"
+            "Telegram Premium"
         )
     val dateOfForwardedMsg =
         addConfig(
