@@ -447,15 +447,9 @@ public class SharedConfig {
         }
 
         public static ProxyInfo fromUrl(String url) {
-            Uri lnk = Uri.parse(url);
-            if (lnk == null) throw new IllegalArgumentException(url);
-            return new ProxyInfo(
-                    lnk.getQueryParameter("server"),
-                    Utilities.parseInt(lnk.getQueryParameter("port")),
-                    lnk.getQueryParameter("user"),
-                    lnk.getQueryParameter("pass"),
-                    lnk.getQueryParameter("secret")
-            );
+            ProxySettings settings = ProxySettings.fromUri(Uri.parse(url));
+            if (settings == null || !settings.isValid()) throw new IllegalArgumentException(url);
+            return new ProxyInfo(settings);
         }
     }
 
@@ -1471,9 +1465,9 @@ public class SharedConfig {
         boolean finalEnable = enable;
         Utilities.globalQueue.postRunnable(() -> {
             if (finalEnable) {
-                ConnectionsManager.setProxySettings(true, finalInfo.address, finalInfo.port, finalInfo.username, finalInfo.password, finalInfo.secret);
+                ConnectionsManager.setProxySettings(true, finalInfo.settings);
             } else {
-                ConnectionsManager.setProxySettings(false, "", 0, "", "", "");
+                ConnectionsManager.setProxySettings(false, null);
             }
             AndroidUtilities.runOnUIThread(() -> NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.proxySettingsChanged));
 

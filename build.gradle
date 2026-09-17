@@ -7,6 +7,10 @@ plugins {
 }
 
 subprojects {
+    // media3 modules (TMessagesProj_Modules) carry their own android config.
+    if (project.path.startsWith(':TMessagesProj_Modules')) {
+        return
+    }
     afterEvaluate {
         if (plugins.hasPlugin("com.android.library") || plugins.hasPlugin("com.android.application")) {
             android {
@@ -53,7 +57,7 @@ subprojects {
                     def manifestFile = file("${project.projectDir}/src/main/AndroidManifest.xml")
 
                     if (manifestFile.exists()) {
-                        def manifest = new XmlSlurper().parse(manifestFile)
+                        def manifest = new groovy.xml.XmlSlurper().parse(manifestFile)
                         def manifestPackage = manifest.@package.text()
 
                         if (manifestPackage) {
