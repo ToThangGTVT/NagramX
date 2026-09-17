@@ -48,6 +48,11 @@ Official APKs use the following Android signing certificate:
 
 4. For FCM support: Replace `TMessagesProj/google-services.json` with your own configuration file.
 
+   Telegram only delivers pushes to your Firebase project if it knows its credentials. In the Firebase console
+   go to *Project settings → Service accounts → Generate new private key*, then upload that JSON at
+   [my.telegram.org/apps](https://my.telegram.org/apps) under **FCM credentials** for the same `api_id` used
+   in `local.properties`. Without this step the app registers its token fine but never receives any push.
+
 5. Replace project-specific metadata:
 
     - Set your Google Maps API key in the `com.google.android.maps.v2.API_KEY` meta-data entry in `TMessagesProj/src/main/AndroidManifest.xml`.
