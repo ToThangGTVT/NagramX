@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "882415699296",
-    "project_id": "nagram-b3ef4",
-    "storage_bucket": "nagram-b3ef4.firebasestorage.app"
+    "project_number": "859013112471",
+    "project_id": "nagram-x-13730",
+    "storage_bucket": "nagram-x-13730.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:882415699296:android:59c582db874ee494a68a05",
+        "mobilesdk_app_id": "1:859013112471:android:23a01d37790752a858bfd2",
         "android_client_info": {
           "package_name": "com.utc.tele.vip"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyAERPJ2iff9n04QdGMcxDbHegUr1qYM9ew"
+          "current_key": "AIzaSyCGnJhedoe7e49cFJc-I9IL6YkNygX5znE"
         }
       ],
       "services": {
