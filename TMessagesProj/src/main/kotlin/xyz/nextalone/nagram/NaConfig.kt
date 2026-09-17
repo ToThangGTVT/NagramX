@@ -174,9 +174,7 @@ object NaConfig {
         addConfig(
             "CustomTitle",
             ConfigItem.configTypeString,
-            LocaleController.getString(
-                R.string.NekoX
-            )
+            "Telegram Premium"
         )
     val useSystemUnlock =
         addConfig(
