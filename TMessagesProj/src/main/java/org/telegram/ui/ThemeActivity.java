@@ -129,6 +129,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
     public final static int THEME_TYPE_NIGHT = 1;
     public final static int THEME_TYPE_OTHER = 2;
     public final static int THEME_TYPE_THEMES_BROWSER = 3;
+    public final static int THEME_TYPE_DAY = 4;
 
     private ListAdapter listAdapter;
     private RecyclerListView listView;
@@ -138,6 +139,9 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
 
     private ArrayList<Theme.ThemeInfo> darkThemes = new ArrayList<>();
     private ArrayList<Theme.ThemeInfo> defaultThemes = new ArrayList<>();
+    private ArrayList<Theme.ThemeInfo> dayDefaultThemes = new ArrayList<>();
+    private ArrayList<Theme.ThemeInfo> dayCustomThemes = new ArrayList<>();
+    private ThemesHorizontalListCell dayThemesHorizontalListCell;
     private int currentType;
 
     private Theme.ThemeInfo sharingTheme;
@@ -195,6 +199,9 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
     private int automaticBrightnessRow;
     private int automaticBrightnessInfoRow;
     private int preferedHeaderRow;
+    private int dayThemeHeaderRow;
+    private int dayThemeListRow;
+    private int dayThemeInfoRow;
     private int newThemeInfoRow;
     private int themeHeaderRow;
     private int bubbleRadiusHeaderRow;
@@ -560,6 +567,9 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
         themeAccentListRow = -1;
         themeInfoRow = -1;
         preferedHeaderRow = -1;
+        dayThemeHeaderRow = -1;
+        dayThemeListRow = -1;
+        dayThemeInfoRow = -1;
         automaticHeaderRow = -1;
         automaticBrightnessRow = -1;
         automaticBrightnessInfoRow = -1;
@@ -619,8 +629,17 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
 
         defaultThemes.clear();
         darkThemes.clear();
+        dayDefaultThemes.clear();
+        dayCustomThemes.clear();
         for (int a = 0, N = Theme.themes.size(); a < N; a++) {
             Theme.ThemeInfo themeInfo = Theme.themes.get(a);
+            if (currentType == THEME_TYPE_NIGHT && themeInfo.isLight() && !(themeInfo.info != null && themeInfo.info.document == null)) {
+                if (themeInfo.pathToFile != null) {
+                    dayCustomThemes.add(themeInfo);
+                } else {
+                    dayDefaultThemes.add(themeInfo);
+                }
+            }
             if (currentType != THEME_TYPE_BASIC && currentType != THEME_TYPE_THEMES_BROWSER) {
                 if (themeInfo.isLight() || themeInfo.info != null && themeInfo.info.document == null) {
                     continue;
@@ -633,6 +652,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             }
         }
         Collections.sort(defaultThemes, (o1, o2) -> Integer.compare(o1.sortIndex, o2.sortIndex));
+        Collections.sort(dayDefaultThemes, (o1, o2) -> Integer.compare(o1.sortIndex, o2.sortIndex));
 
         if (currentType == THEME_TYPE_THEMES_BROWSER) {
             selectThemeHeaderRow = rowCount++; // TYPE_HEADER
@@ -736,6 +756,9 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                 automaticBrightnessInfoRow = rowCount++;
             }
             if (Theme.selectedAutoNightType != Theme.AUTO_NIGHT_TYPE_NONE) {
+                dayThemeHeaderRow = rowCount++;
+                dayThemeListRow = rowCount++;
+                dayThemeInfoRow = rowCount++;
                 preferedHeaderRow = rowCount++;
                 themeListRow = rowCount++;
                 hasThemeAccents = Theme.getCurrentNightTheme().hasAccentColors();
@@ -751,6 +774,9 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
 
         if (themesHorizontalListCell != null) {
             themesHorizontalListCell.notifyDataSetChanged(listView.getWidth());
+        }
+        if (dayThemesHorizontalListCell != null) {
+            dayThemesHorizontalListCell.notifyDataSetChanged(listView.getWidth());
         }
 
         if (listAdapter != null) {
@@ -2075,6 +2101,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
         private final static int TYPE_SAVE_TO_GALLERY = 19;
         private final static int TYPE_APP_ICON = 20;
         private final static int TYPE_CHOOSE_COLOR = 21;
+        private final static int TYPE_DAY_THEME_LIST = 22;
 
         private Context mContext;
         private boolean first = true;
@@ -2092,7 +2119,7 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
         public boolean isEnabled(RecyclerView.ViewHolder holder) {
             int type = holder.getItemViewType();
             return type == 0 || type == TYPE_TEXT_SETTING || type == TYPE_THEME_TYPE || type == TYPE_TEXT_CHECK ||
-                    type == TYPE_NIGHT_THEME || type == TYPE_THEME_LIST || type == TYPE_THEME_ACCENT_LIST ||
+                    type == TYPE_NIGHT_THEME || type == TYPE_THEME_LIST || type == TYPE_DAY_THEME_LIST || type == TYPE_THEME_ACCENT_LIST ||
                     type == TYPE_TEXT_PREFERENCE || type == 18 || type == TYPE_APP_ICON || type == TYPE_CHOOSE_COLOR;
         }
 
@@ -2306,6 +2333,18 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     themesHorizontalListCell.setDrawDivider(hasThemeAccents);
                     themesHorizontalListCell.setFocusable(false);
                     view = themesHorizontalListCell;
+                    view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(148)));
+                    break;
+                case TYPE_DAY_THEME_LIST:
+                    dayThemesHorizontalListCell = new ThemesHorizontalListCell(mContext, ThemeActivity.this, THEME_TYPE_DAY, dayDefaultThemes, dayCustomThemes) {
+                        @Override
+                        protected void updateRows() {
+                            ThemeActivity.this.updateRows(false);
+                        }
+                    };
+                    dayThemesHorizontalListCell.setDrawDivider(false);
+                    dayThemesHorizontalListCell.setFocusable(false);
+                    view = dayThemesHorizontalListCell;
                     view.setLayoutParams(new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(148)));
                     break;
                 case TYPE_THEME_ACCENT_LIST: {
@@ -2573,6 +2612,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                         headerCell.setText(getString("AutoNightBrightness", R.string.AutoNightBrightness));
                     } else if (position == preferedHeaderRow) {
                         headerCell.setText(getString("AutoNightPreferred", R.string.AutoNightPreferred));
+                    } else if (position == dayThemeHeaderRow) {
+                        headerCell.setText(getString(R.string.AutoNightDayTheme));
                     } else if (position == settingsRow) {
                         headerCell.setText(getString("SETTINGS", R.string.SETTINGS));
                     } else if (position == themeHeaderRow) {
@@ -2663,6 +2704,10 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                     }
                     break;
                 }
+                case TYPE_DAY_THEME_LIST: {
+                    dayThemesHorizontalListCell.scrollToCurrentTheme(listView.getMeasuredWidth(), false);
+                    break;
+                }
                 case TYPE_THEME_ACCENT_LIST: {
                     RecyclerListView accentsList = (RecyclerListView) holder.itemView;
                     ThemeAccentsListAdapter adapter = (ThemeAccentsListAdapter) accentsList.getAdapter();
@@ -2750,11 +2795,11 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
             } else if (position == themeInfoRow || position == nightTypeInfoRow || position == scheduleFromToInfoRow ||
                     position == settings2Row || position == newThemeInfoRow || position == chatListInfoRow || position == bubbleRadiusInfoRow ||
                     position == saveToGallerySectionRow || position == appIconShadowRow || position == lastShadowRow || position == stickersSectionRow ||
-                    position == mediaSoundSectionRow || position == otherSectionRow) {
+                    position == mediaSoundSectionRow || position == otherSectionRow || position == dayThemeInfoRow) {
                 return TYPE_SHADOW;
             } else if (position == nightDisabledRow || position == nightScheduledRow || position == nightAutomaticRow || position == nightSystemDefaultRow) {
                 return TYPE_THEME_TYPE;
-            } else if (position == scheduleHeaderRow || position == automaticHeaderRow || position == preferedHeaderRow ||
+            } else if (position == scheduleHeaderRow || position == automaticHeaderRow || position == preferedHeaderRow || position == dayThemeHeaderRow ||
                     position == settingsRow || position == themeHeaderRow || position == textSizeHeaderRow ||
                     position == chatListHeaderRow || position == bubbleRadiusHeaderRow || position == swipeGestureHeaderRow ||
                     position == selectThemeHeaderRow || position == appIconHeaderRow || position == mediaSoundHeaderRow ||
@@ -2774,6 +2819,8 @@ public class ThemeActivity extends BaseFragment implements NotificationCenter.No
                 return TYPE_NIGHT_THEME;
             } else if (position == themeListRow) {
                 return TYPE_THEME_LIST;
+            } else if (position == dayThemeListRow) {
+                return TYPE_DAY_THEME_LIST;
             } else if (position == themeAccentListRow) {
                 return TYPE_THEME_ACCENT_LIST;
             } else if (position == bubbleRadiusRow) {

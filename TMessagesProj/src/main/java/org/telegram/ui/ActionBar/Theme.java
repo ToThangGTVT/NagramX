@@ -6606,6 +6606,24 @@ public class Theme {
         }
     }
 
+    public static ThemeInfo getCurrentDayTheme() {
+        return currentDayTheme != null ? currentDayTheme : defaultTheme;
+    }
+
+    // Picks the theme used while auto-night mode is in its "day" phase, without turning auto-night off.
+    public static void setCurrentDayTheme(ThemeInfo theme) {
+        if (theme == null) {
+            return;
+        }
+        if (!isCurrentThemeNight()) {
+            // Day phase is showing: apply right away (applyTheme also stores it as the day theme).
+            NotificationCenter.getGlobalInstance().postNotificationName(NotificationCenter.needSetDayNightTheme, theme, false, null, -1);
+            return;
+        }
+        currentDayTheme = theme;
+        MessagesController.getGlobalMainSettings().edit().putString("theme", theme.getKey()).apply();
+    }
+
     public static void checkAutoNightThemeConditions() {
         checkAutoNightThemeConditions(false);
     }

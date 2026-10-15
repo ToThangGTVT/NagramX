@@ -307,4 +307,5 @@
     <string name="TabletModeOff">Tắt</string>
     <string name="DefaultScheduleDelay">Độ trể mặc định</string>
     <string name="DisableSwipeToNext">Tắt tính năng vuốt để chuyển sang mục tiếp theo</string>
+    <string name="AutoNightDayTheme">Giao diện ban ngày</string>
 </resources>

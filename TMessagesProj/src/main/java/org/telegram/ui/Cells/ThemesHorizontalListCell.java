@@ -454,7 +454,7 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
         @Override
         protected void onAttachedToWindow() {
             super.onAttachedToWindow();
-            Theme.ThemeInfo t = currentType == ThemeActivity.THEME_TYPE_NIGHT ? Theme.getCurrentNightTheme() : Theme.getCurrentTheme();
+            Theme.ThemeInfo t = getSelectedTheme();
             button.setChecked(themeInfo == t, false);
             if (themeInfo != null && themeInfo.info != null && !themeInfo.themeLoaded) {
                 String name = FileLoader.getAttachFileName(themeInfo.info.document);
@@ -468,7 +468,7 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
         }
 
         public void updateCurrentThemeCheck() {
-            Theme.ThemeInfo t = currentType == ThemeActivity.THEME_TYPE_NIGHT ? Theme.getCurrentNightTheme() : Theme.getCurrentTheme();
+            Theme.ThemeInfo t = getSelectedTheme();
             button.setChecked(themeInfo == t, true);
         }
 
@@ -727,6 +727,15 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
         });
     }
 
+    private Theme.ThemeInfo getSelectedTheme() {
+        if (currentType == ThemeActivity.THEME_TYPE_NIGHT) {
+            return Theme.getCurrentNightTheme();
+        } else if (currentType == ThemeActivity.THEME_TYPE_DAY) {
+            return Theme.getCurrentDayTheme();
+        }
+        return Theme.getCurrentTheme();
+    }
+
     public void selectTheme(Theme.ThemeInfo themeInfo) {
         if (themeInfo.info != null) {
             if (!themeInfo.themeLoaded) {
@@ -752,6 +761,11 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
                 return;
             }
             Theme.setCurrentNightTheme(themeInfo);
+        } else if (currentType == ThemeActivity.THEME_TYPE_DAY) {
+            if (themeInfo == Theme.getCurrentDayTheme()) {
+                return;
+            }
+            Theme.setCurrentDayTheme(themeInfo);
         } else {
             if (themeInfo == Theme.getCurrentTheme()) {
                 return;
@@ -769,7 +783,7 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
         }
         EmojiThemes.saveCustomTheme(themeInfo, themeInfo.currentAccentId);
 
-        if (currentType != ThemeActivity.THEME_TYPE_NIGHT) {
+        if (currentType != ThemeActivity.THEME_TYPE_NIGHT && currentType != ThemeActivity.THEME_TYPE_DAY) {
             Theme.turnOffAutoNight(fragment);
         }
     }
@@ -783,7 +797,7 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
             return;
         }
         adapter.notifyDataSetChanged();
-        Theme.ThemeInfo t = currentType == ThemeActivity.THEME_TYPE_NIGHT ? Theme.getCurrentNightTheme() : Theme.getCurrentTheme();
+        Theme.ThemeInfo t = getSelectedTheme();
         if (prevThemeInfo != t) {
             scrollToCurrentTheme(width, false);
         }
@@ -878,7 +892,7 @@ public class ThemesHorizontalListCell extends RecyclerListView implements Notifi
         if (width == 0) {
             return;
         }
-        prevThemeInfo = currentType == ThemeActivity.THEME_TYPE_NIGHT ? Theme.getCurrentNightTheme() : Theme.getCurrentTheme();
+        prevThemeInfo = getSelectedTheme();
         int index = defaultThemes.indexOf(prevThemeInfo);
         if (index < 0) {
             index = customThemes.indexOf(prevThemeInfo) + defaultThemes.size();
