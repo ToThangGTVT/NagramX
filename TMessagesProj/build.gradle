@@ -50,7 +50,7 @@ Properties properties
 def base64 = System.getenv('LOCAL_PROPERTIES')
 if (base64 != null && !base64.isBlank()) {
     properties = new Properties()
-    properties.load(new ByteArrayInputStream(Base64.decoder.decode(base64)))
+    properties.load(new ByteArrayInputStream(Base64.mimeDecoder.decode(base64.trim())))
 } else if (project.rootProject.file('local.properties').exists()) {
     properties = new Properties()
     properties.load(project.rootProject.file('local.properties').newDataInputStream())

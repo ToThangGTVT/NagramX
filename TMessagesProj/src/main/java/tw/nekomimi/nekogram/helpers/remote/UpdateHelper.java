@@ -201,8 +201,9 @@ public class UpdateHelper extends BaseRemoteHelper {
     }
 
     public void checkNewVersionAvailable(Delegate delegate, boolean updateAlways) {
-        this.updateAlways = updateAlways;
-        load(delegate);
+        // This build is not distributed through the NagramX update channel,
+        // so never offer (or download) its APKs: always report "up to date".
+        delegate.onTLResponse(null, null);
     }
 
     private static final class InstanceHolder {
