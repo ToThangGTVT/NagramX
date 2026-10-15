@@ -14,6 +14,7 @@ idea {
     module {
         excludeDirs += [
             file('jni/td'),
+            file('jni/third_party/absl'),
             file('jni/third_party/boringssl'),
             file('jni/third_party/dav1d'),
             file('jni/third_party/ffmpeg'),
@@ -21,6 +22,10 @@ idea {
             file('jni/third_party/libyuv'),
             file('jni/third_party/openh264'),
             file('jni/third_party/xiph'),
+            file('jni/third_party/wamr'),
+            file('jni/third_party/libprisma'),
+            file('jni/third_party/boost-regex'),
+            file('jni/tgcalls'),
             file('jni/tlottie'),
             file('jni/voip/webrtc'),
             file('jni/sqlite')
@@ -28,10 +33,11 @@ idea {
     }
 }
 
-def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: '0'
+def buildTimestamp = System.getenv('BUILD_TIMESTAMP') ?: System.currentTimeMillis().intdiv(1000L).toString()
 def commitId = System.getenv('COMMIT_ID')
 def verName = "${APP_VERSION_NAME}${commitId?.take(7) ? "-${commitId.take(7)}" : ''}"
-def verCode = 1262
+// versionCode = build time in epoch seconds (stays below Android's 2100000000 limit until 2036)
+def verCode = buildTimestamp as int
 
 def officialVer = APP_VERSION_NAME
 def officialCode = APP_VERSION_CODE
@@ -237,6 +243,7 @@ dependencies {
     implementation 'androidx.dynamicanimation:dynamicanimation:1.0.0'
     implementation 'androidx.mediarouter:mediarouter:1.8.1'
     implementation 'com.google.zxing:core:3.5.4'
+    implementation 'com.neovisionaries:nv-websocket-client:2.14'
     implementation 'androidx.sharetarget:sharetarget:1.2.0'
     implementation 'androidx.interpolator:interpolator:1.0.0'
     implementation 'androidx.biometric:biometric:1.1.0'
