@@ -102,18 +102,24 @@ jobs:
     runs-on: ubuntu-latest
     needs:
       - build
+    env:
+      HAS_UPLOAD_BOT: ${{ secrets.HELPER_BOT_TOKEN != '' }}
     steps:
       - name: Checkout
+        if: env.HAS_UPLOAD_BOT == 'true'
         uses: actions/checkout@v7
       - name: Download Artifacts
+        if: env.HAS_UPLOAD_BOT == 'true'
         uses: actions/download-artifact@v8
         with:
           path: artifacts
       - name: Set up Python
+        if: env.HAS_UPLOAD_BOT == 'true'
         uses: actions/setup-python@v7
         with:
           python-version: 3.12
       - name: Send to Telegram
+        if: env.HAS_UPLOAD_BOT == 'true'
         env:
           APP_ID: ${{ secrets.APP_ID }}
           APP_HASH: ${{ secrets.APP_HASH }}
